@@ -28,6 +28,7 @@ router.post("/token", (req, res) => {
         id: userData.id,
         username: userData.username,
         email: userData.email,
+        role: userData.role,
       };
       const accessToken = generateAccessToken(user);
 
@@ -56,8 +57,8 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ message: "Email or password incorrect!" });
   }
 
-  const { id, username, email: userEmail } = result.rows[0];
-  const user = { id, username, email: userEmail };
+  const { id, username, email: userEmail, role } = result.rows[0];
+  const user = { id, username, email: userEmail, role };
 
   // Generate access and refresh tokens
   const accessToken = generateAccessToken(user);

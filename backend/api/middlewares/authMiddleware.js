@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { roles } = require("../constants");
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -19,4 +20,17 @@ function authenticateToken(req, res, next) {
   });
 }
 
-module.exports = { authenticateToken };
+function authRole(...roles) {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(401).json({ message: "Not allowed" });
+    }
+
+    next();
+  };
+}
+
+module.exports = {
+  authenticateToken,
+  authRole,
+};

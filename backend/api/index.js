@@ -13,6 +13,7 @@ const customCss =
 const authRouter = require("./routes/auth");
 const devRouter = require("./routes/dev");
 const userRouter = require("./routes/user");
+const crudRouter = require("./routes/crud");
 
 app.use(
   "/api-docs",
@@ -34,6 +35,7 @@ app.use(cors());
 app.use("/api", authRouter);
 app.use("/api", devRouter);
 app.use("/api", userRouter);
+app.use("/api", crudRouter);
 
 const PORT = process.env.PORT || 3000;
 
