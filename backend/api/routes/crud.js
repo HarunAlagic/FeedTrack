@@ -43,6 +43,16 @@ router.get(
   }
 );
 
+router.post(
+  "/user",
+  authenticateToken,
+  authRole("superAdmin", "tellerAdmin", "branchAdmin"),
+  async (req, res) => {
+    const { email, password, role } = req.body;
+    // TODO: check if username or email already exists
+  }
+);
+
 function getUsersData(users) {
   return users.map(({ password, ...rest }) => {
     return { ...rest };
