@@ -14,11 +14,36 @@ router.get(
       "user",
     ]);
 
-    res.json(getUserData(result.rows));
+    const users = result.rows;
+
+    res.json(getUsersData(users));
   }
 );
 
-function getUserData(users) {
+router.get(
+  "/user/:id",
+  authenticateToken,
+  authRole("superAdmin", "tellerAdmin", "branchAdmin"),
+  async (req, res) => {
+    const { id } = req.params;
+
+    const result = await db.query('SELECT * FROM "Person" WHERE id = $1', [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+
+    const user = result.rows[0];
+
+    if (user.role !== "user") {
+      return res.status(403).json({ message: "Not allowed!" });
+    }
+
+    res.json(user);
+  }
+);
+
+function getUsersData(users) {
   return users.map(({ password, ...rest }) => {
     return { ...rest };
   });
