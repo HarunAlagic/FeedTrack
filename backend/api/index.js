@@ -3,6 +3,10 @@ require("dotenv").config();
 const app = express();
 const cors = require("cors");
 
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const swaggerUI = require("swagger-ui-express");
 const swaggerJson = require("./swagger.json");
 const { swagger } = require("./constants");
@@ -24,10 +28,6 @@ app.use(
     customCssUrl: swagger.cssUrl,
   })
 );
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
 app.use("/api", authRouter);
 app.use("/api", devRouter);

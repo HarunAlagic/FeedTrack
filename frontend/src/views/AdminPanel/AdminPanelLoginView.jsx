@@ -6,11 +6,12 @@ import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
 import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { backendUrl } from "../../constants";
 
-const YOUR_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
+const YOUR_CLIENT_ID =
+  "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
 
 const Login = () => {
-
   const [loginWithEmail, setLoginWithEmail] = useState(true);
 
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const Login = () => {
         localStorage.image = decodedToken.picture;
 
         // Fetch maximum ID from the database
-        const maxIdResponse = await fetch('https://feedtrack-backend.vercel.app/api/getMaxUserId');
+        const maxIdResponse = await fetch(backendUrl + "/api/getMaxUserId");
         const maxIdData = await maxIdResponse.json();
         const nextId = maxIdData.maxId + 1;
 
@@ -38,67 +39,75 @@ const Login = () => {
           username: "defaultUsername",
           password: "defaultPassword",
           mobileNumber: "123456789",
-          role: "defaultRole"
+          role: "defaultRole",
         };
 
         localStorage.user = userData;
         console.log(JSON.stringify(userData));
 
         // Check if user exists in the database
-        const existingUserResponse = await fetch('https://feedtrack-backend.vercel.app/api/addUser', {
-          method: 'POST',
+        const existingUserResponse = await fetch(backendUrl + "/api/user", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(userData)
+          body: JSON.stringify(userData),
         });
-        let existingUserResult = " ", errorData = " ";
+        let existingUserResult = " ",
+          errorData = " ";
         if (existingUserResponse.ok) {
           existingUserResult = await existingUserResponse.json();
           if (existingUserResult.message === "User already exists") {
-            console.log('User already exists');
+            console.log("User already exists");
           } else {
-            console.log('User added successfully');
+            console.log("User added successfully");
           }
         } else if (existingUserResponse.status === 400) {
           errorData = await existingUserResponse.json();
-          console.error('Error adding user:', errorData.message);
+          console.error("Error adding user:", errorData.message);
         } else {
-          console.error('Error adding user:', existingUserResponse.statusText);
+          console.error("Error adding user:", existingUserResponse.statusText);
         }
 
         localStorage.token = existingUserResult.token || errorData.token;
-        navigate('/homePage', { state: { "username": localStorage.getItem("email"), "token": localStorage.getItem("token") } });
+        navigate("/homePage", {
+          state: {
+            username: localStorage.getItem("email"),
+            token: localStorage.getItem("token"),
+          },
+        });
 
         console.log("Redirection completed successfully.");
       } catch (error) {
-        console.error('Error decoding JWT token:', error);
+        console.error("Error decoding JWT token:", error);
       }
     } else {
-      console.log('Google login failed');
+      console.log("Google login failed");
     }
   }
 
   useEffect(() => {
     // Ensuring that google is defined before using it
-    if (typeof window.google !== 'undefined' && window.google.accounts) {
+    if (typeof window.google !== "undefined" && window.google.accounts) {
       window.google.accounts.id.initialize({
         client_id: YOUR_CLIENT_ID,
-        callback: handleCallbackResponse
+        callback: handleCallbackResponse,
       });
     } else {
-      console.log('Google Identity Services library not loaded.');
+      console.log("Google Identity Services library not loaded.");
     }
 
-    if (localStorage.getItem("username") != null && localStorage.getItem("refreshToken") != null)
-      navigate('/homePage', {
-        state:
-        {
-          "username": localStorage.getItem("username"),
-          "refreshToken": localStorage.getItem("refreshToken"),
-          "accessToken": localStorage.getItem("accessToken")
-        }
-      })
+    if (
+      localStorage.getItem("username") != null &&
+      localStorage.getItem("refreshToken") != null
+    )
+      navigate("/homePage", {
+        state: {
+          username: localStorage.getItem("username"),
+          refreshToken: localStorage.getItem("refreshToken"),
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      });
 
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
@@ -127,7 +136,7 @@ const Login = () => {
   };
 
   const handleGoogleSignIn = () => {
-    if (typeof window.google !== 'undefined' && window.google.accounts) {
+    if (typeof window.google !== "undefined" && window.google.accounts) {
       window.google.accounts.id.prompt();
     } else {
       console.log("Google SDK is not fully loaded.");
@@ -137,7 +146,6 @@ const Login = () => {
   const [error, setError] = useState("");
 
   async function loginLogic(event) {
-
     event.preventDefault();
 
     const inputType = loginWithEmail ? "email" : "number";
@@ -149,7 +157,9 @@ const Login = () => {
 
     // Validation
     if (!name || !pass) {
-      setError(!name ? "Email or phone number is required!" : "Password is required!");
+      setError(
+        !name ? "Email or phone number is required!" : "Password is required!"
+      );
       return;
     }
 
@@ -160,60 +170,65 @@ const Login = () => {
       requestBody["number"] = inputType == "email" ? " " : name;
 
       console.log(JSON.stringify(requestBody));
-      const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
-        method: 'POST',
+      const response = await fetch(backendUrl + "/api/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
 
       let responseData;
       if (response.ok) {
         // Handle successful login
-        console.log('Login successful');
-        responseData = await response.json()
-      //navigate('/homePage', { state: { "username": responseData.username, "token": responseData.token, "secret": responseData.secret}});
+        console.log("Login successful");
+        responseData = await response.json();
+        //navigate('/homePage', { state: { "username": responseData.username, "token": responseData.token, "secret": responseData.secret}});
       } else {
         // Handle login error
-        console.error('Login failed');
+        console.error("Login failed");
       }
 
       console.log(JSON.stringify(responseData));
       const dataSecret = responseData.secret;
       // Postavljanje secret-a u localStorage
-      localStorage.setItem('token', responseData.token);
-      localStorage.setItem('username', responseData.username);
-      localStorage.setItem('secretURL', responseData.secret.otpauth_url);
-      localStorage.setItem('secret', responseData.secret);
-      console.log("localStorage.getItem('secret'): "+JSON.stringify(localStorage.getItem('secret')));
+      localStorage.setItem("token", responseData.token);
+      localStorage.setItem("username", responseData.username);
+      localStorage.setItem("secretURL", responseData.secret.otpauth_url);
+      localStorage.setItem("secret", responseData.secret);
+      console.log(
+        "localStorage.getItem('secret'): " +
+          JSON.stringify(localStorage.getItem("secret"))
+      );
       // Pozivanje twofactorsetup rute
-      const twofactorResponse = await fetch('https://feedtrack-backend.vercel.app/api/twofactorsetup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          secret: localStorage.secretURL
-        })
-      });
+      const twofactorResponse = await fetch(
+        backendUrl + "/api/twofactorsetup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            secret: localStorage.secretURL,
+          }),
+        }
+      );
 
       if (twofactorResponse.ok) {
         const twofactorData = await twofactorResponse.json();
-        console.log("2fa response je: "+twofactorData);
+        console.log("2fa response je: " + twofactorData);
         const { dataUrl } = twofactorData;
         Object.entries(dataSecret).forEach(([ključ, vrijednost]) => {
           console.log(`${ključ}: ${vrijednost}`);
         });
-        console.log("ovo je sta se salje: "+dataSecret);
+        console.log("ovo je sta se salje: " + dataSecret);
         // Process the data URL (e.g., render QR code)
         processQRCode(dataUrl, dataSecret);
       } else {
-        console.error('Failed to retrieve twofactorsetup data');
+        console.error("Failed to retrieve twofactorsetup data");
       }
-
     } catch (error) {
-      console.error('Error logging in:', error);
+      console.error("Error logging in:", error);
     }
   }
 
@@ -226,39 +241,44 @@ const Login = () => {
       <button id="verifyButton">Verify</button>
     `;
 
-    const QRcontainer = document.getElementById('qrCodeContainer');
-    const container = document.getElementById('container');
+    const QRcontainer = document.getElementById("qrCodeContainer");
+    const container = document.getElementById("container");
     QRcontainer.hidden = false;
     container.hidden = true;
     QRcontainer.innerHTML = template;
 
     // Define verifyToken globally
     window.verifyToken = (secret) => {
-      const token = document.getElementById('tokenInput').value;
-      fetch('https://feedtrack-backend.vercel.app/api/verify', {
-        method: 'POST',
+      const token = document.getElementById("tokenInput").value;
+      fetch(backendUrl + "/api/verify", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ userToken: token, secret: secret }),
       })
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
           if (data.success) {
-            navigate('/homePage', { state: { "username": localStorage.getItem("email"), "token": localStorage.getItem("token") } });
-            // window.location.href = 'https://feedtrack.vercel.app/homePage';
+            navigate("/homePage", {
+              state: {
+                username: localStorage.getItem("email"),
+                token: localStorage.getItem("token"),
+              },
+            });
+            // window.location.href = backendUrl + '/homePage';
           } else {
-            document.getElementById('tokenInput').value = "Incorrect code";
+            document.getElementById("tokenInput").value = "Incorrect code";
           }
         })
-        .catch(error => {
-          console.error('Error verifying token:', error);
+        .catch((error) => {
+          console.error("Error verifying token:", error);
         });
     };
 
     // Attach event listener to the Verify button
-    const verifyButton = document.getElementById('verifyButton');
-    verifyButton.addEventListener('click', () => {
+    const verifyButton = document.getElementById("verifyButton");
+    verifyButton.addEventListener("click", () => {
       verifyToken(secret);
     });
   };
