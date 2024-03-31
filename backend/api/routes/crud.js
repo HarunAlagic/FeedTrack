@@ -1,5 +1,7 @@
 const router = require("express").Router();
 const db = require("../db");
+const express = require('express');
+
 const {
   authenticateToken,
   authRole,
@@ -59,4 +61,44 @@ function getUsersData(users) {
   });
 }
 
-module.exports = router;
+/* TODO: needs to modify to work with the router
+function setupRoutes(genericModel, tableName) {
+  const handleError = (res, error) => {
+      res.status(500).json({ error: error.message });
+  };
+
+  router.get('/', async (req, res) => {
+      try { res.json(await genericModel.getAll(tableName)); } 
+      catch (error) { handleError(res, error); }
+  });
+
+  router.get('/:id', async (req, res) => {
+      try { res.json(await genericModel.getById(tableName, req.params.id)); } 
+      catch (error) { handleError(res, error); }
+  });
+
+  router.post('/', async (req, res) => {
+      try { res.status(201).json(await genericModel.add(tableName, req.body)); } 
+      catch (error) { handleError(res, error); }
+  });
+
+  router.put('/:id', async (req, res) => {
+      try { 
+          const entity = await genericModel.update(tableName, req.params.id, req.body);
+          res.json(entity || { error: 'Entity not found' }); 
+      } 
+      catch (error) { handleError(res, error); }
+  });
+
+  router.delete('/:id', async (req, res) => {
+      try { await genericModel.deleteById(tableName, req.params.id); res.sendStatus(204); } 
+      catch (error) { handleError(res, error); }
+  });
+
+  router.delete('/', async (req, res) => {
+      try { await genericModel.deleteAll(tableName); res.sendStatus(204); } 
+      catch (error) { handleError(res, error); }
+  });
+}*/
+
+module.exports = {router};
