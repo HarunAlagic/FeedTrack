@@ -20,7 +20,7 @@ function authenticateToken(req, res, next) {
   );
 
   const extendedToken = jwt.sign(
-    { ...decodedToken, exp: decoded.exp + 30 * 60 },
+    { ...decodedToken, exp: decodedToken.exp + 30 * 60 },
     process.env.ACCESS_TOKEN_SECRET
   );
   req.headers["authorization"] = extendedToken;
@@ -52,5 +52,5 @@ function generateUserJwtToken(user) {
 module.exports = {
   authenticateToken,
   authRole,
-  generateUserJwtToken,
+  generateUserJwtToken
 };
