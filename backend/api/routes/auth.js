@@ -2,12 +2,10 @@ const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const db = require("../db");
-const fs = require("fs");
-const os = require("os");
 const { generateUserJwtToken } = require("./../middlewares/authMiddleware");
 const { authenticateToken } = require("./../middlewares/authMiddleware");
-const speakeasy = require('speakeasy');
-var QRCode = require('qrcode');
+const speakeasy = require("speakeasy");
+var QRCode = require("qrcode");
 
 let refreshTokens = [];
 
@@ -34,8 +32,8 @@ router.post("/token", (req, res) => {
   refreshTokens.push(refreshToken);
   */
   /*make a structure(cookie) where we store user and accessToken so when we call this route
-  * we can check if token has expired if so we destroy refreshToken related
-  * to it */
+   * we can check if token has expired if so we destroy refreshToken related
+   * to it */
   /*
   jwt.verify(cookie.accessToken, process.env.ACCESS_TOKEN_SECRET, function(err, decoded){
     if(err){
@@ -90,11 +88,12 @@ router.post("/token", (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-
   let { email, number, password } = req.body;
 
   if (!email && !number) {
-    return res.status(400).json({ message: "Email or mobile number is required!" });
+    return res
+      .status(400)
+      .json({ message: "Email or mobile number is required!" });
   }
 
   let query;
@@ -115,7 +114,9 @@ router.post("/login", async (req, res) => {
   console.log(result);
 
   if (result.rowCount === 0) {
-    return res.status(400).json({ message: "Email or mobile number incorrect!" });
+    return res
+      .status(400)
+      .json({ message: "Email or mobile number incorrect!" });
   }
 
   const isValidPassword = await bcrypt.compare(
@@ -136,38 +137,61 @@ router.post("/login", async (req, res) => {
 
   // Generate secret for 2FA
   var secret = speakeasy.generateSecret();
-  console.log("citav secret je objekat koji izgleda ovako: "+ secret);
+  console.log("citav secret je objekat koji izgleda ovako: " + secret);
   console.log("secret generirani: " + secret.otpauth_url);
 
   res.status(200).json({
     ...user,
     token,
-    secret
+    secret,
   });
 });
 
 // Route for adding a new user to the database
 router.post("/addUser", async (req, res) => {
   try {
-
-    const { id, name, lastName, email, username, password, mobileNumber, role } = req.body;
+    const {
+      id,
+      name,
+      lastName,
+      email,
+      username,
+      password,
+      mobileNumber,
+      role,
+    } = req.body;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return res.status(400).json({ message: "Invalid email address" });
+    if (!emailRegex.test(email))
+      return res.status(400).json({ message: "Invalid email address" });
 
-    const existingUser = await db.query('SELECT * FROM "Person" WHERE email = $1', [email]);
+    const existingUser = await db.query(
+      'SELECT * FROM "Person" WHERE email = $1',
+      [email]
+    );
     if (existingUser.rows.length > 0) {
       const token = generateUserJwtToken(JSON.stringify(existingUser.rows[0]));
-      console.log("ovo je za existing user token: "+token);
+      console.log("ovo je za existing user token: " + token);
       refreshTokens.push(token);
-      return res.status(400).json({ message: "User already exists", token: token });
+      return res
+        .status(400)
+        .json({ message: "User already exists", token: token });
     }
     console.log(password);
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await db.query(
       'INSERT INTO "Person" ("id", "name", "lastName", "username", "password", "email", "mobileNumber", "role") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [id, name, lastName, username, hashedPassword, email, mobileNumber, role || "superAdmin"]
+      [
+        id,
+        name,
+        lastName,
+        username,
+        hashedPassword,
+        email,
+        mobileNumber,
+        role || "superAdmin",
+      ]
     );
 
     console.log("OVO JE REZULTAT: " + newUser.rows[0]);
@@ -179,7 +203,12 @@ router.post("/addUser", async (req, res) => {
     console.log("secret generirani: " + secret.otpauth_url);
     console.log(token);
 
-    res.status(201).json({ message: "User added successfully", user: newUser.rows[0], token: token, secret: secret });
+    res.status(201).json({
+      message: "User added successfully",
+      user: newUser.rows[0],
+      token: token,
+      secret: secret,
+    });
   } catch (error) {
     console.error("Error adding user:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -207,47 +236,30 @@ router.post("/logout", (req, res) => {
   res.status(200).json({ message: "Logged out successfully." });
 });
 
-router.post('/twofactorsetup', (req, res) => {
-  const secret = req.body;
-console.log("u sklopu rute 2fa je ovo secret: " + JSON.stringify(secret.secret));
+router.post("/twofactorsetup", (req, res) => {
+  const { secret } = req.body;
 
-  console.log("ovo je secret.otpauth_url: "+secret);
-  QRCode.toDataURL(secret.secret, (err, data_url) => {
+  QRCode.toDataURL(secret, (err, dataUrl) => {
     if (err) {
-      return res.status(500).json({ error: 'Error generating QR code' });
+      return res.status(500).json({ error: "Error generating QR code" });
     }
-    res.json({ dataUrl: data_url });
+
+    res.json({ dataUrl });
   });
 });
 
 // verify 2fa
-router.post('/verify', (req, res) => {
-  console.log(req.body.secret);
-  const token = req.body.userToken;
-  const secret = req.body.secret;
+router.post("/verify", (req, res) => {
+  const { userToken: token, secret } = req.body;
   const baseSecret = secret.base32;
-  var verified = speakeasy.totp.verify({ secret: baseSecret, encoding: 'base32', token: token });
+
+  const verified = speakeasy.totp.verify({
+    secret: baseSecret,
+    encoding: "base32",
+    token,
+  });
+
   res.json({ success: verified });
-})
-
-/*function that changes value of variable in .env file*/
-/*example setEnvValue("VAR1", "SOMETHING") -> VAR1 = SOMETHING*/
-function setEnvValue(key, value) {
-
-  // read file from hdd & split if from a linebreak to a array
-  const ENV_VARS = fs.readFileSync("./.env", "utf8").split(os.EOL);
-
-  // find the env we want based on the key
-  const target = ENV_VARS.indexOf(ENV_VARS.find((line) => {
-    return line.match(new RegExp(key));
-  }));
-
-  // replace the key/value with the new value
-  ENV_VARS.splice(target, 1, `${key}=${value}`);
-
-  // write everything back to the file system
-  fs.writeFileSync("./.env", ENV_VARS.join(os.EOL));
-
-}
+});
 
 module.exports = router;
