@@ -19,13 +19,25 @@ const columns: GridColDef[] = [
 
 const AdminPanelBranchesView = () =>{
     const [open, setOpen] = useState(false);
+    const [selectedRow, setSelectedRow] = useState(null);
+
+    const handleEdit = (row) => {
+        setSelectedRow(row);
+        setOpen(true);
+    };
+
+    const handleCreateNewBranch = () => {
+        setSelectedRow(null); // Reset selectedRow when creating a new teller
+        setOpen(true);
+    };
+
     return (
         <div className="branches">
             <div className="info">
-                <button onClick={() => setOpen(true)}>Create a new branch</button>
+            <button onClick={handleCreateNewBranch}>Create a new branch</button>
             </div>
-            <DataTable columns={columns} rows={rows}/>
-            {open && <Add slug="branch" columns={columns} setOpen={setOpen} />}
+            <DataTable columns={columns} rows={rows} onEdit={handleEdit}/>
+            {open && <Add slug={selectedRow ? "edit" : "branch"} data={selectedRow} columns={columns} setOpen={setOpen} />}
         </div>
     );  
 }

@@ -19,13 +19,25 @@ const columns: GridColDef[] = [
 
 const AdminPanelTellersView = () =>{
     const [open, setOpen] = useState(false);
+    const [selectedRow, setSelectedRow] = useState(null);
+
+    const handleEdit = (row) => {
+        setSelectedRow(row);
+        setOpen(true);
+    };
+
+    const handleCreateNewTeller = () => {
+        setSelectedRow(null); // Reset selectedRow when creating a new teller
+        setOpen(true);
+    };
+
     return (
         <div className="tellers">
             <div className="info">
-                <button onClick={() => setOpen(true)}>Create a new teller</button>
+            <button onClick={handleCreateNewTeller}>Create a new teller</button>
             </div>
-            <DataTable columns={columns} rows={rows}/>
-            {open && <Add slug="teller" columns={columns} setOpen={setOpen} />}
+            <DataTable columns={columns} rows={rows} onEdit={handleEdit}/>
+            {open && <Add slug={selectedRow ? "edit" : "teller"} data={selectedRow} columns={columns} setOpen={setOpen} />}
         </div>
     );  
 }
