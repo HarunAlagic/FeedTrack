@@ -1,0 +1,41 @@
+import * as React from 'react';
+import "./add.scss"
+import { GridColDef } from '@mui/x-data-grid';
+
+type Props = {
+    slug: string;
+    columns: GridColDef[];
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const Add = (props: Props) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        //add new item
+        // mutation.mutate();
+        props.setOpen(false)
+      };
+    return (
+        <div className="add">
+          <div className="modal">
+            <span className="close" onClick={() => props.setOpen(false)}>
+              X
+            </span>
+            <h1>Add a new {props.slug}</h1>
+            <form onSubmit={handleSubmit}>
+              {props.columns
+                .filter((item) => item.field !== "id" && item.field !== "rating")
+                .map((column) => (
+                  <div className="item">
+                    <label>{column.headerName}</label>
+                    <input type={column.type} placeholder={column.field} />
+                  </div>
+                ))}
+              <button>Confirm</button>
+            </form>
+          </div>
+        </div>
+      );
+}
+
+export default Add
