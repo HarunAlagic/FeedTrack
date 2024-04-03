@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { backendUrl } from "../../constants";
+import { deployURLs } from "./../../../public/constants.js";
 
 const AdminHomePage = () => {
   const { state } = useLocation();
@@ -14,19 +14,19 @@ const AdminHomePage = () => {
       setUsername(state.username);
       setToken(state.token);
     }
-    // if(localStorage.getItem(token)==null) navigate('/');
   }, []);
 
   async function logoutLogic(event) {
-    // event.preventDefault();
-    console.log(JSON.stringify({ token: localStorage.getItem("token") }));
+    const tokenn = localStorage.getItem("token").token;
     try {
-      const response = await fetch(backendUrl + "/api/logout", {
+      const response = await fetch(`${deployURLs.backendURL}/api/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ token: localStorage.getItem("token") }),
+        body: JSON.stringify({
+          token: JSON.stringify(localStorage.getItem("token")),
+        }),
       });
 
       if (response.ok) {
