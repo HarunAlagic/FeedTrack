@@ -13,7 +13,7 @@ const { swagger } = require("./constants");
 
 const authRouter = require("./routes/auth");
 const devRouter = require("./routes/dev");
-const userRouter = require("./routes/user");
+const adminRouter = require("./routes/admin");
 const crudRouter = require("./routes/crud");
 
 app.use(
@@ -31,7 +31,7 @@ app.use(
 
 app.use("/api", authRouter);
 app.use("/api", devRouter);
-app.use("/api", userRouter);
+app.use("/api", adminRouter);
 app.use("/api", crudRouter);
 
 const PORT = process.env.PORT || 3000;

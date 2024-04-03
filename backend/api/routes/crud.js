@@ -4,7 +4,7 @@ const {
   authenticateToken,
   authRole,
 } = require("../middlewares/authMiddleware");
-const genericCRUD = require("./genericCRUD");
+const genericCRUD = require("./tables/genericCRUD");
 
 function setupRoutes(genericModel, tableName) {
   const handleError = (res, error) => {

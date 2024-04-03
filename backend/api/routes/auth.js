@@ -6,10 +6,6 @@ const {
   generateUserJwtToken,
   authenticateToken,
 } = require("./../middlewares/authMiddleware");
-const {
-  generateUserJwtToken,
-  authenticateToken,
-} = require("./../middlewares/authMiddleware");
 const speakeasy = require("speakeasy");
 var QRCode = require("qrcode");
 
