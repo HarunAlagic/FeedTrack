@@ -2,8 +2,10 @@ const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const db = require("../db");
-const { generateUserJwtToken } = require("./../middlewares/authMiddleware");
-const { authenticateToken } = require("./../middlewares/authMiddleware");
+const {
+  generateUserJwtToken,
+  authenticateToken,
+} = require("./../middlewares/authMiddleware");
 const speakeasy = require("speakeasy");
 var QRCode = require("qrcode");
 

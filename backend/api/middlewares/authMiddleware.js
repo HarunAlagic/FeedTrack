@@ -3,8 +3,6 @@ const jwt = require("jsonwebtoken");
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
 
-  console.log(authHeader);
-
   if (!authHeader) {
     return res.status(401).json({ message: "You are not authenticated!" });
   }
@@ -52,5 +50,5 @@ function generateUserJwtToken(user) {
 module.exports = {
   authenticateToken,
   authRole,
-  generateUserJwtToken
+  generateUserJwtToken,
 };

@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const db = require("../db");
-const express = require('express');
+const bcrypt = require("bcrypt");
 
 const {
   authenticateToken,
@@ -75,7 +75,7 @@ router.post("/user", async (req, res) => {
         .status(400)
         .json({ message: "User already exists", token: token });
     }
-    console.log(password);
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await db.query(
@@ -92,7 +92,6 @@ router.post("/user", async (req, res) => {
       ]
     );
 
-    console.log("OVO JE REZULTAT: " + newUser.rows[0]);
     const token = generateUserJwtToken(JSON.stringify(newUser.rows[0]));
     refreshTokens.push(token);
 
@@ -108,13 +107,59 @@ router.post("/user", async (req, res) => {
       secret: secret,
     });
   } catch (error) {
-    console.error("Error adding user:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
-router.post("/admin", authRole("superAdmin"), async (req, res) => {
-  const { name, lastName, email, username, password, mobileNumber } = req.body;
+router.post("/admin", async (req, res) => {
+  const { name, lastName, email, username, password, mobileNumber, role } =
+    req.body;
+
+  const adminRoles = ["tellerAdmin", "branchAdmin"];
+
+  const newAdminInfo = [
+    name,
+    lastName,
+    username,
+    password,
+    email,
+    mobileNumber,
+    role,
+  ];
+
+  if (newAdminInfo.some((info) => !info)) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  const existingUser = await db.query(
+    'SELECT * FROM "Person" WHERE email = $1',
+    [email]
+  );
+
+  if (existingUser.rowCount !== 0) {
+    return res.status(400).json({ message: "User already exists" });
+  }
+
+  if (!adminRoles.includes(role)) {
+    return res.status(400).json({ message: "Invalid role" });
+  }
+
+  newAdminInfo.password = await bcrypt.hash(password, 10);
+
+  try {
+    const maxId = await db.query('SELECT MAX(id) AS maxId FROM "Person"');
+    const newId = parseInt(maxId.rows[0].maxid) + 1;
+
+    const result = await db.query(
+      'INSERT INTO "Person" ("id", "name", "lastName", "username", "password", "email", "mobileNumber", "role") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+      [newId, ...newAdminInfo]
+    );
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+
+  res.status(200).json({ message: "Admin successfully created." });
 });
 
 function getUsersData(users) {
@@ -163,4 +208,4 @@ function setupRoutes(genericModel, tableName) {
   });
 }*/
 
-module.exports = {router};
+module.exports = router;

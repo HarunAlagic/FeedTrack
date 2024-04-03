@@ -1,6 +1,6 @@
-const genericModel = require('./../genericCRUD');
+const genericModel = require("./genericCRUD");
 
-const tableName = 'Person';
+const tableName = "Person";
 
 // can be directly accessed, without need to provide with a tableName as a parameter - even better refactoring
 
@@ -34,5 +34,5 @@ module.exports = {
   addPerson,
   updatePerson,
   deletePerson,
-  deleteAllPersons
+  deleteAllPersons,
 };
