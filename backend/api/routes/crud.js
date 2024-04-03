@@ -7,46 +7,32 @@ const {
   authRole,
 } = require("../middlewares/authMiddleware");
 
-router.get(
-  "/users",
+const genericCRUD = require("./genericCRUD");
+
+router.get("/users",
   authenticateToken,
   authRole("superAdmin", "tellerAdmin", "branchAdmin"),
   async (req, res) => {
-    const result = await db.query('SELECT * FROM "Person" WHERE role = $1', [
-      "user",
-    ]);
-
+    const result = await db.query('SELECT * FROM "Person" WHERE role = $1', ["user"]);
     const users = result.rows;
-
     res.json(getUsersData(users));
   }
 );
 
-router.get(
-  "/user/:id",
+router.get("/user/:id",
   authenticateToken,
   authRole("superAdmin", "tellerAdmin", "branchAdmin"),
   async (req, res) => {
     const { id } = req.params;
-
     const result = await db.query('SELECT * FROM "Person" WHERE id = $1', [id]);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: "User not found!" });
-    }
-
+    if (result.rowCount === 0) return res.status(404).json({ message: "User not found!" });
     const user = result.rows[0];
-
-    if (user.role !== "user") {
-      return res.status(403).json({ message: "Not allowed!" });
-    }
-
+    if (user.role == "user") return res.status(403).json({ message: "Not allowed!" });
     res.json(user);
   }
 );
 
-router.post(
-  "/user",
+router.post("/user",
   authenticateToken,
   authRole("superAdmin", "tellerAdmin", "branchAdmin"),
   async (req, res) => {
@@ -61,11 +47,16 @@ function getUsersData(users) {
   });
 }
 
-/* TODO: needs to modify to work with the router
+setupRoutes(router, "Person");
+setupRoutes(router, "Feedback");
+
+// TODO: needs to modify to work with the router
 function setupRoutes(genericModel, tableName) {
   const handleError = (res, error) => {
       res.status(500).json({ error: error.message });
   };
+
+  const router = express.Router(); 
 
   router.get('/', async (req, res) => {
       try { res.json(await genericModel.getAll(tableName)); } 
@@ -99,6 +90,8 @@ function setupRoutes(genericModel, tableName) {
       try { await genericModel.deleteAll(tableName); res.sendStatus(204); } 
       catch (error) { handleError(res, error); }
   });
-}*/
+  
+  return router; 
+}
 
-module.exports = {router};
+module.exports = router;
