@@ -1,14 +1,9 @@
 const router = require("express").Router();
 const db = require("../db");
 const express = require('express');
-
-const {
-  authenticateToken,
-  authRole,
-} = require("../middlewares/authMiddleware");
-
+const { authenticateToken, authRole } = require("../middlewares/authMiddleware");
 const genericCRUD = require("./genericCRUD");
-
+/*
 router.get("/users",
   authenticateToken,
   authRole("superAdmin", "tellerAdmin", "branchAdmin"),
@@ -40,58 +35,72 @@ router.post("/user",
     // TODO: check if username or email already exists
   }
 );
-
+*/
 function getUsersData(users) {
   return users.map(({ password, ...rest }) => {
     return { ...rest };
   });
 }
 
-setupRoutes(router, "Person");
-setupRoutes(router, "Feedback");
-
 // TODO: needs to modify to work with the router
 function setupRoutes(genericModel, tableName) {
   const handleError = (res, error) => {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   };
 
-  const router = express.Router(); 
+  const router = express.Router();
 
-  router.get('/', async (req, res) => {
-      try { res.json(await genericModel.getAll(tableName)); } 
+  router.get('/', authenticateToken,
+    authRole("superAdmin", "tellerAdmin", "branchAdmin"), async (req, res) => {
+      try { res.json(await genericModel.getAll(tableName)); }
       catch (error) { handleError(res, error); }
-  });
+    });
 
-  router.get('/:id', async (req, res) => {
-      try { res.json(await genericModel.getById(tableName, req.params.id)); } 
+  router.get('/:id', authenticateToken,
+    authRole("superAdmin", "tellerAdmin", "branchAdmin"), async (req, res) => {
+      try { res.json(await genericModel.getById(tableName, req.params.id)); }
       catch (error) { handleError(res, error); }
-  });
+    });
 
-  router.post('/', async (req, res) => {
-      try { res.status(201).json(await genericModel.add(tableName, req.body)); } 
+  router.post('/', authenticateToken,
+    authRole("superAdmin", "tellerAdmin", "branchAdmin"), async (req, res) => {
+      try { res.status(201).json(await genericModel.add(tableName, req.body)); }
       catch (error) { handleError(res, error); }
-  });
+    });
 
-  router.put('/:id', async (req, res) => {
-      try { 
-          const entity = await genericModel.update(tableName, req.params.id, req.body);
-          res.json(entity || { error: 'Entity not found' }); 
-      } 
+  router.put('/:id', authenticateToken,
+    authRole("superAdmin", "tellerAdmin", "branchAdmin"), async (req, res) => {
+      try {
+        const entity = await genericModel.update(tableName, req.params.id, req.body);
+        res.json(entity || { error: 'Entity not found' });
+      }
       catch (error) { handleError(res, error); }
-  });
+    });
 
-  router.delete('/:id', async (req, res) => {
-      try { await genericModel.deleteById(tableName, req.params.id); res.sendStatus(204); } 
+  router.delete('/:id', authenticateToken,
+    authRole("superAdmin", "tellerAdmin", "branchAdmin"), async (req, res) => {
+      try { await genericModel.deleteById(tableName, req.params.id); res.sendStatus(204); }
       catch (error) { handleError(res, error); }
-  });
+    });
 
-  router.delete('/', async (req, res) => {
-      try { await genericModel.deleteAll(tableName); res.sendStatus(204); } 
+  router.delete('/', authenticateToken,
+    authRole("superAdmin", "tellerAdmin", "branchAdmin"), async (req, res) => {
+      try { await genericModel.deleteAll(tableName); res.sendStatus(204); }
       catch (error) { handleError(res, error); }
-  });
-  
-  return router; 
+    });
+
+  return router;
 }
+
+// Example usage:
+const userRouter = setupRoutes(genericCRUD, "Person");
+const feedbackRouter = setupRoutes(genericCRUD, "Feedback");
+const branchRouter = setupRoutes(genericCRUD, "Branches");
+const tellerRouter = setupRoutes(genericCRUD, "Tellers");
+
+router.use("/users", userRouter);
+router.use("/feedbacks", feedbackRouter);
+router.use("/branches", branchRouter);
+router.use("/teller", tellerRouter);
 
 module.exports = router;
