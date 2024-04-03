@@ -12,8 +12,8 @@ let refreshTokens = [];
 router.post("/login", async (req, res) => {
   let { email, number, password } = req.body;
   if (!email && !number) return res.status(400).json({ message: "Email or mobile number is required!" });
-  const query = (email!=" ") ? 'SELECT * FROM "Person" WHERE "email" = $1' : 'SELECT * FROM "Person" WHERE "mobileNumber" = $1';
-  const queryValues = (email!=" ") ? [email] : [number];
+  const query = (email != " ") ? 'SELECT * FROM "Person" WHERE "email" = $1' : 'SELECT * FROM "Person" WHERE "mobileNumber" = $1';
+  const queryValues = (email != " ") ? [email] : [number];
   const result = await db.query(query, queryValues);
   if (result.rowCount === 0) return res.status(400).json({ message: "Email or mobile number incorrect!" });
   const isValidPassword = await bcrypt.compare(
