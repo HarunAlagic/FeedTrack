@@ -34,7 +34,7 @@ const dataTable = (props: Props) => {
                 <img src="/edit.svg" alt="" />
               </div>
               <div className="delete" onClick={() => handleDelete(params.row.id)}>
-                <img src="/delete.svg" alt="" />
+                <img src="/deleteBranchTeller.svg" alt="" />
               </div>
             </div>
           );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "../../styles/AdminPanel/AdminPanelTellersView.scss"
-import Add from '../../components/add/add';
-import DataTable from '../../components/dataTable/dataTable';
+import Add from '../../components/addBranchTeller/add';
+import DataTable from '../../components/dataTableBranchTeller/dataTable';
 import { GridColDef, GridRowsProp } from '@mui/x-data-grid';
 
 const columns: GridColDef[] = [
