@@ -1,0 +1,28 @@
+h2, h3{
+  color: #424ad8aa;
+  margin: 30px;
+}
+button {
+  margin-top: 50px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.feedback-container {
+  width: 90%;
+  margin: 0 auto;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+  
+button:hover {
+  background-color: #0056b3;
+}
