@@ -51,8 +51,8 @@ function setupRoutes(genericModel, tableName) {
 
 const userRouter = setupRoutes(genericCRUD, "Person");
 const feedbackRouter = setupRoutes(genericCRUD, "Feedback");
-const branchRouter = setupRoutes(genericCRUD, "Branches");
-const tellerRouter = setupRoutes(genericCRUD, "Tellers");
+const branchRouter = setupRoutes(genericCRUD, "Branch");
+const tellerRouter = setupRoutes(genericCRUD, "Teller");
 const dummyRouter = setupRoutes(genericCRUD, "Dummy"); // only for testing
 
 router.use("/users", userRouter);

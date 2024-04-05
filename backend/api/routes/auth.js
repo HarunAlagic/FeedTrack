@@ -26,7 +26,8 @@ router.post("/login", async (req, res) => {
   const token = generateUserJwtToken(user).token;
   refreshTokens.push(token);
   var secret = speakeasy.generateSecret(); // Generate secret for 2FA
-  res.status(200).json({ ...user, token, secret });
+  var verified = result.rows[0].verified;
+  res.status(200).json({ ...user, token, secret, verified });
 });
 
 // Route for adding a new user to the database

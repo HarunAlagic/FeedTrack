@@ -187,7 +187,15 @@ const Login = () => {
       localStorage.setItem('username', responseData.username);
       localStorage.setItem('secretURL', responseData.secret.otpauth_url);
       localStorage.setItem('secret', responseData.secret);
+      localStorage.setItem('verified', responseData.verified);
+      localStorage.setItem('id', responseData.id);
+
       console.log("localStorage.getItem('secret'): "+JSON.stringify(localStorage.getItem('secret')));
+
+      if(responseData.verified === true){
+        navigate('/homePage', { state: { "username": localStorage.getItem("username"), "token": localStorage.getItem("token"), "id": localStorage.getItem("id") } });
+      }
+
       // Pozivanje 2faSetup rute
       const twofactorResponse = await fetch(`${deployURLs.backendURL}/api/2faSetup`, {
         method: 'POST',
@@ -246,6 +254,18 @@ const Login = () => {
         .then(response => response.json())
         .then(data => {
           if (data.success) {
+            const user_id = localStorage.getItem("id");
+            //ubaciti promjenu verified u true;
+            fetch(`${deployURLs.backendURL}/api/users/${user_id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ "verified": true }),
+            })
+            console.log("nesta se desilo");
+            //provjera id-a
+            console.log("user id prije redirect je: ",localStorage.getItem("id"));
             navigate('/homePage', { state: { "username": localStorage.getItem("email"), "token": localStorage.getItem("token") } });
             // window.location.href = 'https://feedtrack.vercel.app/homePage';
           } else {

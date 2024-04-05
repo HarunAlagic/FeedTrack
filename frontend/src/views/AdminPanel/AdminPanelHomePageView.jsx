@@ -18,14 +18,13 @@ const AdminHomePage = () => {
     }, []);
 
     async function logoutLogic(event) {
-        const tokenn = localStorage.getItem("token").token;
         try {
             const response = await fetch(`${deployURLs.backendURL}/api/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "token": JSON.stringify(localStorage.getItem("token")) })
+                body: JSON.stringify({ "token": localStorage.getItem("token") })
             });
 
             if (response.ok) {
