@@ -255,7 +255,6 @@ const Login = () => {
         .then(data => {
           if (data.success) {
             const user_id = localStorage.getItem("id");
-            //ubaciti promjenu verified u true;
             fetch(`${deployURLs.backendURL}/api/users/${user_id}`, {
               method: 'PUT',
               headers: {
@@ -263,9 +262,6 @@ const Login = () => {
               },
               body: JSON.stringify({ "verified": true }),
             })
-            console.log("nesta se desilo");
-            //provjera id-a
-            console.log("user id prije redirect je: ",localStorage.getItem("id"));
             navigate('/homePage', { state: { "username": localStorage.getItem("email"), "token": localStorage.getItem("token") } });
             // window.location.href = 'https://feedtrack.vercel.app/homePage';
           } else {
