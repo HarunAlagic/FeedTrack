@@ -16,7 +16,7 @@ const Branches = () => {
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
     useEffect(() => {
-        fetch(`https://feedtrack-backend.vercel.app/api/branches`)
+        fetch(`http://localhost:3000/api/branches`)
             .then((response) => response.json())
             .then((data: Branch[]) => {
                 if (data.length > 0) {
@@ -38,7 +38,7 @@ const Branches = () => {
     }, []);
 
     const deleteBranch = (id: number) => {
-        fetch(`https://feedtrack-backend.vercel.app/api/branches/${id}`, {
+        fetch(`http://localhost:3000/api/branches/${id}`, {
             method: 'DELETE'
         })
             .then((response) => {

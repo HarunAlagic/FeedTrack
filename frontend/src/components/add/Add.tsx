@@ -44,7 +44,7 @@ const Add = (props: Props) => {
 
     console.log(JSON.stringify(formData));
 
-    fetch(`https://feedtrack-backend.vercel.app/api/users`, {
+    fetch(`http://localhost:3000/api/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

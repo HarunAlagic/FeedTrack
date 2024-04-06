@@ -26,7 +26,7 @@ const Update = (props: Props) => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    fetch("https://feedtrack-backend.vercel.app/api/users")
+    fetch("http://localhost:3000/api/users")
       .then((response) => response.json())
       .then((data) => {
         if (data.length > 0) {
@@ -70,7 +70,7 @@ const Update = (props: Props) => {
 
     console.log(JSON.stringify(formData));
 
-    fetch(`https://feedtrack-backend.vercel.app/api/users/${selectedUserId}`, {
+    fetch(`http://localhost:3000/api/users/${selectedUserId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

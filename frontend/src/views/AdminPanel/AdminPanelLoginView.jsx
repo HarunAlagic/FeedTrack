@@ -27,7 +27,7 @@ const Login = () => {
         localStorage.image = decodedToken.picture;
 
         // Fetch maximum ID from the database
-        const maxIdResponse = await fetch("https://feedtrack-backend.vercel.app/api/getMaxUserId");
+        const maxIdResponse = await fetch("http://localhost:3000/api/getMaxUserId");
         const maxIdData = await maxIdResponse.json();
         const nextId = maxIdData.maxId + 1;
 
@@ -45,7 +45,7 @@ const Login = () => {
         console.log(localStorage.user);
 
         // Check if user exists in the database
-        const existingUserResponse = await fetch("https://feedtrack-backend.vercel.app/api/addUser", {
+        const existingUserResponse = await fetch("http://localhost:3000/api/addUser", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -69,7 +69,7 @@ const Login = () => {
 
         localStorage.user = existingUserResult.user || errorData.user;
         localStorage.token = existingUserResult.token || errorData.token;
-        console.log("ehhhh: "+localStorage.user);
+        console.log("ehhhh: " + localStorage.user);
         navigate('/home', { state: { "user": localStorage.user, "token": localStorage.token } });
 
         console.log("Redirection completed successfully.");
@@ -162,7 +162,7 @@ const Login = () => {
       requestBody["number"] = inputType == "email" ? " " : name;
 
       console.log(JSON.stringify(requestBody));
-      const response = await fetch(`https://feedtrack-backend.vercel.app/api/login`, {
+      const response = await fetch(`http://localhost:3000/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -180,21 +180,22 @@ const Login = () => {
         console.error('Login failed');
       }
 
-      console.log(JSON.stringify(responseData));
-      const dataSecret = responseData.secret;
-      // Postavljanje secret-a u localStorage
-      localStorage.setItem('token', responseData.token);
-      localStorage.setItem('user', responseData.user);
-      localStorage.setItem('secretURL', responseData.secret.otpauth_url);
-      localStorage.setItem('secret', responseData.secret);
-      console.log("localStorage.getItem('secret'): "+JSON.stringify(localStorage.getItem('secret')));
+      console.log(responseData);
+      // Postavljanje objekta u localStorage
+      localStorage.setItem('user', JSON.stringify(responseData.user));
+      localStorage.setItem('secret', JSON.stringify(responseData.secret));
       localStorage.setItem('verified', responseData.verified);
-      localStorage.setItem('id', responseData.id);
-      if(responseData.verified === true){
+      localStorage.setItem('id', responseData.user.id);
+      localStorage.setItem('token', responseData.token);
+      localStorage.setItem('secretURL', responseData.secret.otpauth_url)
+
+      console.log("Evo sad ovo je user iz storage: ", localStorage);
+
+      if (responseData.verified === true) {
         navigate('/home', { state: { "user": localStorage.user, "token": localStorage.token, "id": localStorage.id } });
       }
       // Pozivanje 2faSetup rute
-      const twofactorResponse = await fetch("https://feedtrack-backend.vercel.app/api/2faSetup", {
+      const twofactorResponse = await fetch("http://localhost:3000/api/2faSetup", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -206,12 +207,12 @@ const Login = () => {
 
       if (twofactorResponse.ok) {
         const twofactorData = await twofactorResponse.json();
-        console.log("2fa response je: "+twofactorData);
+        console.log("2fa response je: " + twofactorData);
         const { dataUrl } = twofactorData;
         Object.entries(dataSecret).forEach(([ključ, vrijednost]) => {
           console.log(`${ključ}: ${vrijednost}`);
         });
-        console.log("ovo je sta se salje: "+dataSecret);
+        console.log("ovo je sta se salje: " + dataSecret);
         // Process the data URL (e.g., render QR code)
         processQRCode(dataUrl, dataSecret);
       } else {
@@ -241,7 +242,7 @@ const Login = () => {
     // Define verifyToken globally
     window.verifyToken = (secret) => {
       const token = document.getElementById('tokenInput').value;
-      fetch(`https://feedtrack-backend.vercel.app/api/verify`, {
+      fetch(`http://localhost:3000/api/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -253,7 +254,7 @@ const Login = () => {
           if (data.success) {
             const user_id = localStorage.getItem("id");
             //ubaciti promjenu verified u true;
-            fetch(`https://feedtrack-backend.vercel.app/api/users/${user_id}`, {
+            fetch(`http://localhost:3000/api/users/${user_id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -261,7 +262,7 @@ const Login = () => {
               body: JSON.stringify({ "verified": true }),
             })
             //provjera id-a
-            console.log("user id prije redirect je: ",localStorage.getItem("id"));
+            console.log("user id prije redirect je: ", localStorage.getItem("id"));
             navigate('/home', { state: { "user": localStorage.getItem("user"), "token": localStorage.getItem("token") } });
           } else {
             document.getElementById('tokenInput').value = "Incorrect code";

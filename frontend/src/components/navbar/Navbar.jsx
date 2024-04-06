@@ -10,22 +10,25 @@ const Navbar = () => {
     const [token, setToken] = useState();
     const [user, setUser] = useState(null); 
 
-
     useEffect(() => {
         if (state && state.user) {
             setToken(state.token)
             setUser(state.user);
+            console.log("ovo je state.user: "+state.user);
+            console.log("ovo je state.token: "+state.token);
         }
     }, [state]);
 
+    console.log("OVO JE LOCAL STORAGE TOKEN: "+localStorage.getItem("token"));
+
     async function logoutLogic(event) {
         try {
-            const response = await fetch("https://feedtrack-backend.vercel.app/api/logout", {
+            const response = await fetch("http://localhost:3000/api/logout", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "token": localStorage.getItem("token") })
+                body: state.token
             });
 
             if (response.ok) {

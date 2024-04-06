@@ -21,15 +21,23 @@ router.post("/login", async (req, res) => {
     result.rows[0].password
   );
   if (!isValidPassword) return res.status(400).json({ message: "Password incorrect!" });
+
+  // Stvoriti objekt user s atributima kao cjelinom
   const user = result.rows[0];
   delete user.password;
-  console.log("OVOOO JE USERRR: "+user);
+
+  console.log("OVOOO JE USERRR: " + JSON.stringify(user));
+  console.log("eh sad je kraj");
+  
+  // Generirati token i secret
   const token = generateUserJwtToken(user).token;
-  refreshTokens.push(token);
-  var secret = speakeasy.generateSecret(); // Generate secret for 2FA
-  var verified = result.rows[0].verified;
-  res.status(200).json({ ...user, token, secret, verified });
+  const secret = speakeasy.generateSecret(); // Generate secret for 2FA
+  const verified = result.rows[0].verified;
+
+  // Dodati token, secret i verified kao dodatne atribute u odgovor
+  res.status(200).json({ user, token, secret, verified });
 });
+
 
 // Route for adding a new user to the database
 router.post("/addUser", async (req, res) => {

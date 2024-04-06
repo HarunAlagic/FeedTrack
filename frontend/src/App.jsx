@@ -5,6 +5,7 @@ import Users from './views/AdminPanel/Users.tsx';
 import Tellers from './views/AdminPanel/Tellers.tsx';
 import Branches from './views/AdminPanel/Branches.tsx';
 import Layout from './Layout.tsx';
+import Feedbacks from './views/AdminPanel/Feedbacks.tsx';
 
 function App() {
 
@@ -33,6 +34,10 @@ function App() {
           path:"/branches",
           element:<Branches/>
         },
+        {
+          path:"/feedbacks",
+          element:<Feedbacks/>
+        }
       ]
     }
   ]);

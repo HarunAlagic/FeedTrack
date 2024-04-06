@@ -18,7 +18,7 @@ const AdminHomePage = () => {
 
     async function logoutLogic(event) {
         try {
-            const response = await fetch("https://feedtrack-backend.vercel.app/api/logout", {
+            const response = await fetch("http://localhost:3000/api/logout", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

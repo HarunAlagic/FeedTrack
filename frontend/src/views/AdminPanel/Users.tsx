@@ -14,9 +14,9 @@ interface User {
 const Users = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
-  const [users, setUsers] = useState<User[]>([]); // Korišćenje tipa User[]
+  const [users, setUsers] = useState<User[]>([]); 
   const [columns, setColumns] = useState<GridColDef[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | undefined>(); // Dodali smo stanje za selektovanog korisnika
+  const [selectedUser, setSelectedUser] = useState<User | undefined>(); 
   const navigate = useNavigate();
 
   const { state } = useLocation();
@@ -30,10 +30,10 @@ const Users = () => {
       setToken(state.token)
       setUser(state.user);
     }
-  }, [state]);
+  }, [state, user]);
 
   useEffect(() => {
-    fetch(`https://feedtrack-backend.vercel.app/api/users`)
+    fetch(`http://localhost:3000/api/users`)
       .then((response) => response.json())
       .then((data: User[]) => {
         if (data.length > 0) {
@@ -58,7 +58,7 @@ const Users = () => {
   }, []);
 
   const deleteUser = (id: number) => {
-    fetch(`https://feedtrack-backend.vercel.app/api/users/${id}`, {
+    fetch(`http://localhost:3000/api/users/${id}`, {
       method: 'DELETE'
     })
       .then((response) => {
@@ -84,6 +84,7 @@ const Users = () => {
 
   let isSuperAdmin = false;
   const userDataString = localStorage.user;
+  console.log()
   if (!userDataString) {
     console.error("User data not found in localStorage");
   } else {
