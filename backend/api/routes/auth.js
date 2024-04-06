@@ -8,6 +8,7 @@ var QRCode = require("qrcode");
 
 let refreshTokens = [];
 
+
 // Route for login logic
 router.post("/login", async (req, res) => {
   let { email, number, password } = req.body;
